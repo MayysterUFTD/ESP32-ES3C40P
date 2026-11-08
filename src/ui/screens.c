@@ -30,10 +30,27 @@ void create_screen_main() {
     {
         lv_obj_t *parent_obj = obj;
         {
+            // test
             lv_obj_t *obj = lv_bar_create(parent_obj);
-            lv_obj_set_pos(obj, 165, 155);
+            objects.test = obj;
+            lv_obj_set_pos(obj, 165, 208);
             lv_obj_set_size(obj, 150, 10);
             lv_bar_set_value(obj, 25, LV_ANIM_OFF);
+        }
+        {
+            lv_obj_t *obj = lv_switch_create(parent_obj);
+            lv_obj_set_pos(obj, 215, 35);
+            lv_obj_set_size(obj, 50, 25);
+        }
+        {
+            lv_obj_t *obj = lv_switch_create(parent_obj);
+            lv_obj_set_pos(obj, 215, 85);
+            lv_obj_set_size(obj, 50, 25);
+        }
+        {
+            lv_obj_t *obj = lv_switch_create(parent_obj);
+            lv_obj_set_pos(obj, 216, 135);
+            lv_obj_set_size(obj, 50, 25);
         }
     }
     

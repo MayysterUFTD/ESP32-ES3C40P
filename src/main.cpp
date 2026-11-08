@@ -10,6 +10,7 @@ namespace
 
     constexpr int kDisplayNativeWidth = 320;
     constexpr int kDisplayNativeHeight = 480;
+    // LVGL uses the landscape dimensions selected by the panel rotation.
     constexpr int kScreenWidth = 480;
     constexpr int kScreenHeight = 320;
     constexpr uint8_t kDisplayRotation = 1;
@@ -34,6 +35,7 @@ namespace
         void setRotation(uint8_t rotation) override
         {
             Arduino_ST7796::setRotation(rotation);
+            // Override MADCTL with values verified for the ES3C40P panel.
             static constexpr uint8_t madctlValues[] = {0x48, 0x28, 0xC8, 0xA8};
             writeRegister(0x36, madctlValues[rotation % 4]);
         }
@@ -41,6 +43,7 @@ namespace
     protected:
         void tftInit() override
         {
+            // Use the panel vendor's ST7796S initialization sequence.
             _bus->sendCommand(0x01);
             delay(150);
 
@@ -113,8 +116,10 @@ namespace
         kDisplayNativeWidth,
         kDisplayNativeHeight);
 
+    // LVGL requires the draw buffer to meet its configured alignment.
     alignas(LV_DRAW_BUF_ALIGN) uint16_t drawBuffer[kScreenWidth * 20];
     bool touchPressed = false;
+    // Require several release samples to avoid brief false touch releases.
     uint8_t touchReleaseSamples = 0;
     uint32_t lastTouchTime = 0;
     lv_point_t lastTouchPoint = {0, 0};
@@ -143,6 +148,7 @@ namespace
 
     bool readTouchRegisters(uint8_t *buffer, size_t length)
     {
+        // FT6336U touch data begins at register 0x02.
         Wire.beginTransmission(kTouchAddress);
         Wire.write(0x02);
         if (Wire.endTransmission(false) != 0)
@@ -179,6 +185,7 @@ namespace
             firstFlush = false;
         }
 
+        // Split odd-sized areas so each bulk RGB565 transfer has an even pixel count.
         if ((static_cast<uint32_t>(width) * height) & 1U)
         {
             if (height > 1)
@@ -215,6 +222,7 @@ namespace
                 const uint16_t rawY =
                     (static_cast<uint16_t>(touchData[3] & 0x0F) << 8) | touchData[4];
 
+                // Rotate and mirror the controller coordinates to match landscape display output.
                 lastTouchPoint.x = rawY < kScreenWidth ? rawY : kScreenWidth - 1;
                 lastTouchPoint.y = rawX < kDisplayNativeWidth
                                        ? kDisplayNativeWidth - 1 - rawX
@@ -285,6 +293,7 @@ namespace
 
     uint32_t tick()
     {
+        // LVGL uses Arduino's millisecond clock as its time base.
         return millis();
     }
 
@@ -322,6 +331,7 @@ void setup()
     digitalWrite(kBacklightPin, HIGH);
     display->fillScreen(RGB565_BLACK);
 
+    // Initialize the capacitive touch controller before reading its ID.
     Wire.begin(kTouchSdaPin, kTouchSclPin, 400000);
 
     pinMode(kTouchInterruptPin, OUTPUT);
@@ -351,6 +361,7 @@ void setup()
     lv_display_set_default(lvDisplay);
     lv_display_set_color_format(lvDisplay, LV_COLOR_FORMAT_RGB565);
     lv_display_set_flush_cb(lvDisplay, flushDisplay);
+    // A partial buffer limits RAM use while still allowing LVGL to render in chunks.
     lv_display_set_buffers(
         lvDisplay, drawBuffer, nullptr, sizeof(drawBuffer),
         LV_DISPLAY_RENDER_MODE_PARTIAL);
@@ -362,27 +373,14 @@ void setup()
     lv_indev_set_gesture_min_velocity(touch, 3);
 
     ui_init();
-    // lv_obj_t *screen = lv_display_get_screen_active(lvDisplay);
-    // if (screen == nullptr)
-    // {
-    //     halt("LVGL nie zaladowal ekranu");
-    // }
-    // lv_obj_set_style_bg_color(screen, lv_color_hex(0x102030), LV_PART_MAIN);
-    // lv_obj_set_style_bg_opa(screen, LV_OPA_COVER, LV_PART_MAIN);
-    // lv_obj_add_event_cb(screen, logGesture, LV_EVENT_GESTURE, nullptr);
-    // for (uint32_t i = 0; i < lv_obj_get_child_count(screen); ++i)
-    // {
-    //     lv_obj_set_gesture_bubble(lv_obj_get_child(screen, i), true);
-    // }
-    // lv_display_add_event_cb(lvDisplay, logDisplayRefresh, LV_EVENT_REFR_START, nullptr);
-    // lv_obj_invalidate(screen);
-    // lv_refr_now(lvDisplay);
+    // The generated EEZ UI creates and loads its screen in ui_init().
     Serial.println("ES3C40P LVGL 9.6.0 ready");
 }
 
 void loop()
 {
     ui_tick();
+    lv_bar_set_value(objects.test, random(0, 100), LV_ANIM_OFF);
     lv_timer_handler();
     delay(5);
 }
