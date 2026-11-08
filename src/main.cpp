@@ -217,8 +217,8 @@ namespace
 
                 lastTouchPoint.x = rawY < kScreenWidth ? rawY : kScreenWidth - 1;
                 lastTouchPoint.y = rawX < kDisplayNativeWidth
-                                       ? rawX
-                                       : kDisplayNativeWidth - 1;
+                                       ? kDisplayNativeWidth - 1 - rawX
+                                       : 0;
                 if (!touchPressed)
                 {
                     Serial.printf("Dotyk: x=%u y=%u\n",
