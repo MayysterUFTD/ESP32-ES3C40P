@@ -8,8 +8,11 @@
 namespace
 {
 
-    constexpr int kScreenWidth = 320;
-    constexpr int kScreenHeight = 480;
+    constexpr int kDisplayNativeWidth = 320;
+    constexpr int kDisplayNativeHeight = 480;
+    constexpr int kScreenWidth = 480;
+    constexpr int kScreenHeight = 320;
+    constexpr uint8_t kDisplayRotation = 1;
     constexpr int kBacklightPin = 45;
     constexpr int kDisplayChipSelectPin = 10;
     constexpr int kDisplayDataCommandPin = 46;
@@ -31,7 +34,7 @@ namespace
         void setRotation(uint8_t rotation) override
         {
             Arduino_ST7796::setRotation(rotation);
-            static constexpr uint8_t madctlValues[] = {0x48, 0x68, 0xC8, 0xA8};
+            static constexpr uint8_t madctlValues[] = {0x48, 0x28, 0xC8, 0xA8};
             writeRegister(0x36, madctlValues[rotation % 4]);
         }
 
@@ -105,10 +108,10 @@ namespace
     Es3c40pDisplay *display = new Es3c40pDisplay(
         displayBus,
         GFX_NOT_DEFINED,
-        0,
+        kDisplayRotation,
         true,
-        kScreenWidth,
-        kScreenHeight);
+        kDisplayNativeWidth,
+        kDisplayNativeHeight);
 
     alignas(LV_DRAW_BUF_ALIGN) uint16_t drawBuffer[kScreenWidth * 20];
     bool touchPressed = false;
@@ -207,13 +210,15 @@ namespace
         {
             if ((touchData[0] & 0x0F) > 0)
             {
-                const uint16_t x =
+                const uint16_t rawX =
                     (static_cast<uint16_t>(touchData[1] & 0x0F) << 8) | touchData[2];
-                const uint16_t y =
+                const uint16_t rawY =
                     (static_cast<uint16_t>(touchData[3] & 0x0F) << 8) | touchData[4];
 
-                lastTouchPoint.x = x < kScreenWidth ? x : kScreenWidth - 1;
-                lastTouchPoint.y = y < kScreenHeight ? y : kScreenHeight - 1;
+                lastTouchPoint.x = rawY < kScreenWidth ? rawY : kScreenWidth - 1;
+                lastTouchPoint.y = rawX < kDisplayNativeWidth
+                                       ? rawX
+                                       : kDisplayNativeWidth - 1;
                 if (!touchPressed)
                 {
                     Serial.printf("Dotyk: x=%u y=%u\n",

@@ -23,8 +23,7 @@ void loadScreen(enum ScreensEnum screenId) {
 
 void ui_init() {
     create_screens();
-    currentScreen = SCREEN_ID_MAIN - 1;
-    lv_screen_load(getLvglObjectFromIndex(currentScreen));
+    loadScreen(SCREEN_ID_MAIN);
 
 }
 

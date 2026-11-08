@@ -2,13 +2,13 @@
 
 > **Status: public project skeleton in active development.** This repository is a starting point for further work, not a finished product or production-ready firmware. Display and touch support are experimental and still need to be verified on the hardware.
 
-This project provides a basic PlatformIO configuration for the LCDWIKI ES3C40P module with an ESP32-S3. The current program initializes the ST7796S display and FT6336U touch controller, then creates a simple LVGL demo screen. Application-specific features will be developed later.
+This project provides a basic PlatformIO configuration for the LCDWIKI ES3C40P module with an ESP32-S3. The current program initializes the ST7796S display and FT6336U touch controller, then loads the EEZ Studio-generated LVGL UI. The UI is currently an empty scaffold; application-specific features will be developed later.
 
 ## Hardware
 
 | Component | Controller / interface | ESP32-S3 pins |
 |---|---|---|
-| 320 × 480 display | ST7796S, SPI | CS: GPIO10, DC: GPIO46, SCK: GPIO12, MOSI: GPIO11, MISO: GPIO13 |
+| 320 × 480 display (landscape UI: 480 × 320) | ST7796S, SPI | CS: GPIO10, DC: GPIO46, SCK: GPIO12, MOSI: GPIO11, MISO: GPIO13 |
 | Backlight | GPIO control | GPIO45 |
 | Touchscreen | FT6336U, I²C, address `0x38` | SDA: GPIO16, SCL: GPIO15 |
 | Touch reset and interrupt | GPIO | RESET: GPIO18, INT: GPIO17 |
@@ -41,11 +41,11 @@ The serial monitor is configured for `115200` baud. If PlatformIO does not detec
 
 ## Display rotation
 
-The third argument in the `display` constructor in `src/main.cpp` (after the bus pointer and reset pin) selects the rotation: `0`, `1`, `2`, or `3`. Rotations of 90° and 270° change the display orientation and dimensions. Before using either orientation, update the LVGL resolution, UI layout, and touch coordinates accordingly. The current display and UI configuration does not automatically synchronize these settings when this argument changes.
+The third argument in the `display` constructor in `src/main.cpp` (after the bus pointer and reset pin) selects the rotation: `0`, `1`, `2`, or `3`. The current configuration uses rotation `1` for the landscape UI resolution of 480 × 320 and transforms touch coordinates to match. Changing the rotation requires updating the LVGL resolution, EEZ Studio screen dimensions, UI layout, and touch-coordinate mapping together.
 
 ## Status and limitations
 
-- This is a project skeleton. The LVGL demo screen is not the final application interface.
+- This is a project skeleton. The EEZ Studio UI is an empty scaffold, not the final application interface.
 - The `es3c40p` environment has been built successfully, but correct image output on the physical module has not yet been confirmed.
 - Touch and gesture handling are experimental and require further testing on the device.
 - Changes to rotation, touch mapping, and panel settings require hardware testing.

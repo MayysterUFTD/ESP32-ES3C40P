@@ -26,19 +26,19 @@ void create_screen_main() {
     lv_obj_t *obj = lv_obj_create(0);
     objects.main = obj;
     lv_obj_set_pos(obj, 0, 0);
-    lv_obj_set_size(obj, 320, 480);
+    lv_obj_set_size(obj, 480, 320);
     {
         lv_obj_t *parent_obj = obj;
         {
             lv_obj_t *obj = lv_label_create(parent_obj);
+            lv_obj_set_pos(obj, 196, 152);
             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-            lv_obj_align(obj, LV_ALIGN_CENTER, 0, -80);
             lv_label_set_text_static(obj, "Hello, world!");
         }
         {
             lv_obj_t *obj = lv_button_create(parent_obj);
+            lv_obj_set_pos(obj, 190, 206);
             lv_obj_set_size(obj, 100, 50);
-            lv_obj_align(obj, LV_ALIGN_CENTER, 0, 30);
             {
                 lv_obj_t *parent_obj = obj;
                 {
@@ -51,9 +51,10 @@ void create_screen_main() {
             }
         }
         {
-            lv_obj_t *obj = lv_switch_create(parent_obj);
-            lv_obj_set_size(obj, 50, 25);
-            lv_obj_align(obj, LV_ALIGN_CENTER, 0, -25);
+            lv_obj_t *obj = lv_arc_create(parent_obj);
+            lv_obj_set_pos(obj, 165, 10);
+            lv_obj_set_size(obj, 150, 150);
+            lv_arc_set_value(obj, 25);
         }
     }
     
