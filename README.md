@@ -1,31 +1,31 @@
 # ESP32-ES3C40P
 
-> **Status: publiczny projekt-szkielet w trakcie rozwoju.** To punkt wyjścia do dalszych prac, a nie gotowy produkt ani firmware do zastosowań produkcyjnych. Obsługa wyświetlacza i dotyku jest eksperymentalna i wymaga potwierdzenia na urządzeniu.
+> **Status: public project skeleton in active development.** This repository is a starting point for further work, not a finished product or production-ready firmware. Display and touch support are experimental and still need to be verified on the hardware.
 
-Projekt zawiera bazową konfigurację PlatformIO dla modułu LCDWIKI ES3C40P z ESP32-S3. Aktualny program uruchamia panel ST7796S, inicjalizuje dotyk FT6336U i tworzy prosty ekran demonstracyjny LVGL. Funkcje właściwej aplikacji będą rozwijane później.
+This project provides a basic PlatformIO configuration for the LCDWIKI ES3C40P module with an ESP32-S3. The current program initializes the ST7796S display and FT6336U touch controller, then creates a simple LVGL demo screen. Application-specific features will be developed later.
 
-## Sprzęt
+## Hardware
 
-| Element | Układ / interfejs | Piny ESP32-S3 |
+| Component | Controller / interface | ESP32-S3 pins |
 |---|---|---|
-| Wyświetlacz 320 × 480 | ST7796S, SPI | CS: GPIO10, DC: GPIO46, SCK: GPIO12, MOSI: GPIO11, MISO: GPIO13 |
-| Podświetlenie | sterowanie GPIO | GPIO45 |
-| Ekran dotykowy | FT6336U, I²C, adres `0x38` | SDA: GPIO16, SCL: GPIO15 |
-| Reset i przerwanie dotyku | GPIO | RESET: GPIO18, INT: GPIO17 |
+| 320 × 480 display | ST7796S, SPI | CS: GPIO10, DC: GPIO46, SCK: GPIO12, MOSI: GPIO11, MISO: GPIO13 |
+| Backlight | GPIO control | GPIO45 |
+| Touchscreen | FT6336U, I²C, address `0x38` | SDA: GPIO16, SCL: GPIO15 |
+| Touch reset and interrupt | GPIO | RESET: GPIO18, INT: GPIO17 |
 
-Reset wyświetlacza jest współdzielony z resetem modułu ESP32-S3. Sekwencja inicjalizacji ST7796S w kodzie bazuje na materiale LCDWIKI dla ES3C40P.
+The display reset is shared with the ESP32-S3 module reset. The ST7796S initialization sequence in the code is based on LCDWIKI's ES3C40P resources.
 
-## Wymagania
+## Requirements
 
-- PlatformIO Core lub PlatformIO w VS Code
-- ESP32-S3 ES3C40P z PSRAM
-- Kabel USB obsługujący transmisję danych
+- PlatformIO Core or PlatformIO for VS Code
+- ESP32-S3 ES3C40P module with PSRAM
+- USB cable that supports data transfer
 
-Zależności LVGL i Arduino_GFX są pobierane przez PlatformIO zgodnie z `platformio.ini`.
+LVGL and Arduino_GFX dependencies are installed by PlatformIO as specified in `platformio.ini`.
 
-## Budowanie, wgrywanie i monitor
+## Build, upload, and monitor
 
-Polecenia uruchom w katalogu projektu:
+Run these commands from the project directory:
 
 ```sh
 pio run -e es3c40p
@@ -33,20 +33,20 @@ pio run -e es3c40p -t upload
 pio device monitor -e es3c40p
 ```
 
-Monitor szeregowy skonfigurowany jest na `115200` baud. Jeśli PlatformIO nie wykryje właściwego portu, ustaw `upload_port` i `monitor_port` dla środowiska `es3c40p` w lokalnej konfiguracji.
+The serial monitor is configured for `115200` baud. If PlatformIO does not detect the correct port, set `upload_port` and `monitor_port` for the `es3c40p` environment in your local configuration.
 
-## Rotacja
+## Display rotation
 
-W konstruktorze `display` w `src/main.cpp` trzeci argument (po wskaźniku magistrali i pinie resetu) wybiera rotację: `0`, `1`, `2` lub `3`. Obrót o 90°/270° zmienia orientację i wymiary ekranu; przed użyciem takiej orientacji trzeba dopasować rozdzielczość LVGL, układ UI i współrzędne dotyku. Obecna konfiguracja wyświetlacza i UI nie jest automatycznie synchronizowana przy zmianie tego argumentu.
+The third argument in the `display` constructor in `src/main.cpp` (after the bus pointer and reset pin) selects the rotation: `0`, `1`, `2`, or `3`. Rotations of 90° and 270° change the display orientation and dimensions. Before using either orientation, update the LVGL resolution, UI layout, and touch coordinates accordingly. The current display and UI configuration does not automatically synchronize these settings when this argument changes.
 
-## Stan i ograniczenia
+## Status and limitations
 
-- Projekt jest szkieletem — demonstracyjny ekran LVGL nie stanowi jeszcze docelowego interfejsu aplikacji.
-- Kompilacja środowiska `es3c40p` została sprawdzona, ale poprawne wyświetlanie obrazu na fizycznym module nie jest jeszcze potwierdzone.
-- Obsługa dotyku i gestów pozostaje eksperymentalna; wymagane są dalsze testy na urządzeniu.
-- Zmiana rotacji, mapowania dotyku i parametrów panelu wymaga testów sprzętowych.
+- This is a project skeleton. The LVGL demo screen is not the final application interface.
+- The `es3c40p` environment has been built successfully, but correct image output on the physical module has not yet been confirmed.
+- Touch and gesture handling are experimental and require further testing on the device.
+- Changes to rotation, touch mapping, and panel settings require hardware testing.
 
-## Dokumentacja sprzętu
+## Hardware documentation
 
-- [Instrukcja użytkownika ES3C40P](https://www.lcdwiki.com/res/ES3C40P/4.0inch_IPS_ESP32-S3_ES3C40P_User_Manual.pdf)
-- [Sekwencja inicjalizacji ST7796S dla ES3C40P](https://www.lcdwiki.com/res/ES3C40P/ST7796_Init.txt)
+- [ES3C40P User Manual](https://www.lcdwiki.com/res/ES3C40P/4.0inch_IPS_ESP32-S3_ES3C40P_User_Manual.pdf)
+- [ST7796S initialization sequence for ES3C40P](https://www.lcdwiki.com/res/ES3C40P/ST7796_Init.txt)
