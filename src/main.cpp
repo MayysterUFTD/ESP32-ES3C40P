@@ -12,8 +12,6 @@ namespace
     constexpr int kDisplayNativeHeight = 480;
     constexpr int kScreenWidth = 480;
     constexpr int kScreenHeight = 320;
-    constexpr uint32_t kChartUpdateIntervalMs = 120;
-    constexpr uint8_t kChartTransitionSteps = 32;
     constexpr uint8_t kDisplayRotation = 1;
     constexpr int kBacklightPin = 45;
     constexpr int kDisplayChipSelectPin = 10;
@@ -120,92 +118,6 @@ namespace
     uint8_t touchReleaseSamples = 0;
     uint32_t lastTouchTime = 0;
     lv_point_t lastTouchPoint = {0, 0};
-
-    struct ChartAnimation
-    {
-        lv_obj_t *chart;
-        lv_chart_series_t *series;
-        int32_t startValue;
-        int32_t targetValue;
-        uint8_t step;
-    };
-
-    ChartAnimation chartAnimation = {};
-
-    int32_t interpolateChartValue(int32_t start, int32_t end, float progress)
-    {
-        const float easedProgress = progress * progress * (3.0f - 2.0f * progress);
-        return start + static_cast<int32_t>((end - start) * easedProgress);
-    }
-
-    void updateChart(lv_timer_t *timer)
-    {
-        auto *animation = static_cast<ChartAnimation *>(lv_timer_get_user_data(timer));
-        if (animation->step >= kChartTransitionSteps)
-        {
-            animation->startValue = animation->targetValue;
-            animation->targetValue = static_cast<int32_t>(lv_rand(20, 80));
-            animation->step = 0;
-        }
-
-        ++animation->step;
-        const float progress =
-            static_cast<float>(animation->step) / kChartTransitionSteps;
-        const int32_t value = interpolateChartValue(
-            animation->startValue, animation->targetValue, progress);
-        lv_chart_set_next_value(animation->chart, animation->series, value);
-    }
-
-    bool initializeChart(lv_obj_t *screen)
-    {
-        lv_obj_t *chart = lv_obj_get_child(screen, 0);
-        if (chart == nullptr || !lv_obj_check_type(chart, &lv_chart_class))
-        {
-            Serial.println("UI nie zawiera wykresu LVGL");
-            return false;
-        }
-
-        lv_chart_set_type(chart, LV_CHART_TYPE_LINE);
-        lv_chart_set_point_count(chart, 48);
-        lv_chart_set_axis_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 100);
-
-        chartAnimation.chart = chart;
-        chartAnimation.series = lv_chart_add_series(
-            chart, lv_palette_main(LV_PALETTE_BLUE), LV_CHART_AXIS_PRIMARY_Y);
-        if (chartAnimation.series == nullptr)
-        {
-            Serial.println("Nie udalo sie utworzyc serii wykresu");
-            return false;
-        }
-
-        lv_rand_set_seed(micros() | 1U);
-        int32_t value = static_cast<int32_t>(lv_rand(35, 65));
-        for (uint32_t i = 0; i < 48; ++i)
-        {
-            if (i % 12 == 0)
-            {
-                chartAnimation.startValue = value;
-                chartAnimation.targetValue = static_cast<int32_t>(lv_rand(20, 80));
-            }
-
-            const uint32_t step = i % 12 + 1;
-            const float progress = static_cast<float>(step) / 12.0f;
-            value = interpolateChartValue(
-                chartAnimation.startValue, chartAnimation.targetValue, progress);
-            lv_chart_set_next_value(chart, chartAnimation.series, value);
-        }
-
-        chartAnimation.startValue = value;
-        chartAnimation.targetValue = static_cast<int32_t>(lv_rand(20, 80));
-        chartAnimation.step = 0;
-        if (lv_timer_create(updateChart, kChartUpdateIntervalMs, &chartAnimation) == nullptr)
-        {
-            Serial.println("Nie udalo sie uruchomic aktualizacji wykresu");
-            return false;
-        }
-
-        return true;
-    }
 
     bool readTouchRegister(uint8_t reg, uint8_t *value)
     {
@@ -450,25 +362,21 @@ void setup()
     lv_indev_set_gesture_min_velocity(touch, 3);
 
     ui_init();
-    lv_obj_t *screen = lv_display_get_screen_active(lvDisplay);
-    if (screen == nullptr)
-    {
-        halt("LVGL nie zaladowal ekranu");
-    }
-    if (!initializeChart(objects.main))
-    {
-        halt("Nie udalo sie zainicjalizowac wykresu");
-    }
-    lv_obj_set_style_bg_color(objects.main, lv_color_hex(0x102030), LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(objects.main, LV_OPA_COVER, LV_PART_MAIN);
-    lv_obj_add_event_cb(objects.main, logGesture, LV_EVENT_GESTURE, nullptr);
-    for (uint32_t i = 0; i < lv_obj_get_child_count(objects.main); ++i)
-    {
-        lv_obj_set_gesture_bubble(lv_obj_get_child(objects.main, i), true);
-    }
-    lv_display_add_event_cb(lvDisplay, logDisplayRefresh, LV_EVENT_REFR_START, nullptr);
-    lv_obj_invalidate(screen);
-    lv_refr_now(lvDisplay);
+    // lv_obj_t *screen = lv_display_get_screen_active(lvDisplay);
+    // if (screen == nullptr)
+    // {
+    //     halt("LVGL nie zaladowal ekranu");
+    // }
+    // lv_obj_set_style_bg_color(screen, lv_color_hex(0x102030), LV_PART_MAIN);
+    // lv_obj_set_style_bg_opa(screen, LV_OPA_COVER, LV_PART_MAIN);
+    // lv_obj_add_event_cb(screen, logGesture, LV_EVENT_GESTURE, nullptr);
+    // for (uint32_t i = 0; i < lv_obj_get_child_count(screen); ++i)
+    // {
+    //     lv_obj_set_gesture_bubble(lv_obj_get_child(screen, i), true);
+    // }
+    // lv_display_add_event_cb(lvDisplay, logDisplayRefresh, LV_EVENT_REFR_START, nullptr);
+    // lv_obj_invalidate(screen);
+    // lv_refr_now(lvDisplay);
     Serial.println("ES3C40P LVGL 9.6.0 ready");
 }
 

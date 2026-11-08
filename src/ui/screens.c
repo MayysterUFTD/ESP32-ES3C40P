@@ -30,9 +30,10 @@ void create_screen_main() {
     {
         lv_obj_t *parent_obj = obj;
         {
-            lv_obj_t *obj = lv_chart_create(parent_obj);
-            lv_obj_set_pos(obj, 0, 0);
-            lv_obj_set_size(obj, 480, 320);
+            lv_obj_t *obj = lv_bar_create(parent_obj);
+            lv_obj_set_pos(obj, 165, 155);
+            lv_obj_set_size(obj, 150, 10);
+            lv_bar_set_value(obj, 25, LV_ANIM_OFF);
         }
     }
     
