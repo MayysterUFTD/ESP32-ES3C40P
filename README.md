@@ -23,6 +23,10 @@ The display reset is shared with the ESP32-S3 module reset. The ST7796S initiali
 
 LVGL and Arduino_GFX dependencies are installed by PlatformIO as specified in `platformio.ini`.
 
+## User interface
+
+The LVGL user interface is created in EEZ Studio. The generated UI source files are located in `src/ui`. Make UI layout and widget changes in the EEZ Studio project, then regenerate the source files; avoid editing generated files directly because regeneration may overwrite those changes.
+
 ## Build, upload, and monitor
 
 Run these commands from the project directory:
