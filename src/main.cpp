@@ -105,7 +105,7 @@ namespace
     Es3c40pDisplay *display = new Es3c40pDisplay(
         displayBus,
         GFX_NOT_DEFINED,
-        1,
+        0,
         true,
         kScreenWidth,
         kScreenHeight);
