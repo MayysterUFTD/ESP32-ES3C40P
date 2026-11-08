@@ -30,31 +30,9 @@ void create_screen_main() {
     {
         lv_obj_t *parent_obj = obj;
         {
-            lv_obj_t *obj = lv_label_create(parent_obj);
-            lv_obj_set_pos(obj, 196, 152);
-            lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-            lv_label_set_text_static(obj, "Hello, world!");
-        }
-        {
-            lv_obj_t *obj = lv_button_create(parent_obj);
-            lv_obj_set_pos(obj, 190, 206);
-            lv_obj_set_size(obj, 100, 50);
-            {
-                lv_obj_t *parent_obj = obj;
-                {
-                    lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, 0, 0);
-                    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-                    lv_obj_set_style_align(obj, LV_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-                    lv_label_set_text_static(obj, "Button");
-                }
-            }
-        }
-        {
-            lv_obj_t *obj = lv_arc_create(parent_obj);
-            lv_obj_set_pos(obj, 165, 10);
-            lv_obj_set_size(obj, 150, 150);
-            lv_arc_set_value(obj, 25);
+            lv_obj_t *obj = lv_chart_create(parent_obj);
+            lv_obj_set_pos(obj, 0, 0);
+            lv_obj_set_size(obj, 480, 320);
         }
     }
     

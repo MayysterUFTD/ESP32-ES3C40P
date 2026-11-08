@@ -2,7 +2,7 @@
 
 > **Status: public project skeleton in active development.** This repository is a starting point for further work, not a finished product or production-ready firmware. Display and touch support are experimental and still need to be verified on the hardware.
 
-This project provides a basic PlatformIO configuration for the LCDWIKI ES3C40P module with an ESP32-S3. The current program initializes the ST7796S display and FT6336U touch controller, then loads the EEZ Studio-generated LVGL UI. The UI is currently an empty scaffold; application-specific features will be developed later.
+This project provides a basic PlatformIO configuration for the LCDWIKI ES3C40P module with an ESP32-S3. The current program initializes the ST7796S display and FT6336U touch controller, then loads the EEZ Studio-generated LVGL UI with a chart demo. The chart displays pseudo-random values that transition smoothly over time; application-specific features will be developed later.
 
 ## Hardware
 
@@ -45,7 +45,7 @@ The third argument in the `display` constructor in `src/main.cpp` (after the bus
 
 ## Status and limitations
 
-- This is a project skeleton. The EEZ Studio UI is an empty scaffold, not the final application interface.
+- This is a project skeleton. The EEZ Studio UI currently contains a chart demo, not the final application interface.
 - The `es3c40p` environment has been built successfully, but correct image output on the physical module has not yet been confirmed.
 - Touch and gesture handling are experimental and require further testing on the device.
 - Changes to rotation, touch mapping, and panel settings require hardware testing.
